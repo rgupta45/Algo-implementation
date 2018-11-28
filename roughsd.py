@@ -364,4 +364,524 @@ class Solution(object):
 a=Solution()
 a.numIslands(grid=[["1","1","1","1","1","1"],["1","1","0","0","0","1"],["1","0","1","0","0","1"],["1","0","1","0","0","1"],["1","1","0","1","0","1"]])
 
+class Trie_Autocomplete():
+    head={}
+    def add_word(self,word):
+        curr= self.head
+        for ch in word:
+            if ch not in curr:
+                curr[ch]={}
+            curr=curr[ch]
+        curr['*']=True
+    def search_word(self,word):
+        possible_words=[]
+        pos_word=""
+        base_word=""
+        curr=self.head
+        for ch in word:
+            if ch not in curr:
+                return ('No such word exist')
+            base_word+=ch
+            curr=curr[ch]
+        pos = curr
+        for i in curr.keys():
+            while i != '*':
+                pos_word += i
+                pos = pos[i]
+                i= list(pos.keys())[0]
+            possible_words.append(base_word+pos_word)
+            pos_word=""
+            pos=curr
+        print(possible_words)
+        if '*' in curr:
+            return True
+        else: return False
 
+a=Trie_Autocomplete()
+b=['rohan','rohani','sneha','rita','pramod','ghunghuru','sanjay','vidhya','rajat','mohak','pavan','gurpreet','sanampreet','mohit']
+for i in b:
+    print(i)
+    a.add_word(i)
+print(a.search_word('rohan'))
+
+#0,1,1,2,3,5,8
+#Q1how you find a number at aparticular position of afibonaci series
+#Q given a fibonacci number write aprograme to find the position
+
+def feb(pos):
+    if pos < 2:
+       return pos
+    else:
+        return feb(pos-2)+feb(pos-1)
+def print_fibonacci(pos):
+    arr=[feb(i) for i in range(pos+1)]
+    print(arr)
+print_fibonacci(7)
+
+
+
+a=[4,1,5,2,3,0,10]
+
+def max_heapify(list):
+    for i in range(1,len(list)):
+        left= 2*i
+        right=(2*i+1)
+        largest=i
+        if left <= len(list) and list[left-1] > list[i-1]:
+            largest=left
+        if right <= len(list) and list[right-1] > list[i-1]:
+            if largest==None or (list[right-1]> list[left-1]):
+                largest=right
+            else:
+                largest=left
+        if largest != i:
+            list[i-1],list[largest-1]=list[largest-1],list[i-1]
+        return list
+
+def find_k_smallest_element(a,element):
+    heap=a[:element]
+    heap=max_heapify(heap)
+    for i in range(element,len(a)):
+        if a[i] < heap[0]:
+            heap[0]=a[i]
+            heap=max_heapify(heap)
+    print(heap)
+
+find_k_smallest_element(a,3)
+
+# Check valid parenthisis...
+class Solution(object):
+    def isValid(self, s):
+        """
+        :type s: str
+        :rtype: bool
+        """
+        dict_ = {'(': ')',
+                 '{': '}',
+                 '[': ']'}
+        if len(s) % 2 == 1:
+            return False
+        if len(s) ==0:
+            return True
+        else:
+            stack=[s[:1] for i in s[0] if i in dict_]
+            if len(stack)==0:
+                return False
+            i=1
+            while i < len(s):
+                if len(stack) == 0:
+                    stack.append(s[i])
+                    i+=1
+                if stack[-1] in dict_:
+                    if s[i] != dict_[stack[-1]]:
+                        stack.append(s[i])
+                    elif s[i]==dict_[stack[-1]]:
+                        stack.pop(-1)
+                    i+=1
+                else:
+                    return False
+            if len(stack)==0:
+                return True
+            else:
+                return False
+
+#Palindrom substring Manchers algorithim ---------------needs improvement
+class Solution(object):
+    def _longestPalindrome(self,width,boundary,charecter,pos,leftpos,rightpos):
+        if leftpos < 0:
+            boundary = (leftpos,rightpos)
+            leftpos = leftpos + 1
+            self._longestPalindrome(width, boundary, charecter, pos, leftpos, rightpos)
+        elif rightpos == len(charecter):
+            boundary = (leftpos, rightpos)
+            rightpos=rightpos-1
+            self._longestPalindrome(width, boundary, charecter, pos, leftpos, rightpos)
+        elif charecter[leftpos]==charecter[rightpos]:
+            boundary=(leftpos,rightpos)
+            if leftpos==0 and rightpos == len(charecter)-1:
+                width[charecter[pos]] = [leftpos , rightpos , abs(rightpos - leftpos) + 1]
+                return (width,boundary)
+            width[charecter[pos]] =[leftpos,rightpos,abs(rightpos-leftpos)+1]
+            self._longestPalindrome(width,boundary,charecter,pos,leftpos-1,rightpos+1)
+        elif charecter[leftpos]!=charecter[rightpos]:
+            if boundary[0] < 0:
+               if abs((boundary[0]+1) - (rightpos-1))==0:
+                   width[charecter[pos]] = [boundary[0]+1, rightpos-1, 1]
+               else:
+                   width[charecter[pos]] = [boundary[0] + 1, rightpos - 1, abs((boundary[0]+1) - (rightpos-1)) + 1]
+               boundary = (boundary[0] + 1, rightpos - 1)
+               return (width, boundary)
+            elif boundary[1] == len(charecter):
+               if abs((boundary[1]-1) - (leftpos+1))==0:
+                   width[charecter[pos]] = [leftpos + 1, boundary[1]-1, 1]
+               else:
+                   width[charecter[pos]] = [leftpos + 1, boundary[1]-1, abs((boundary[1]-1) - (leftpos + 1)) + 1]
+               boundary = (leftpos+1, boundary[1] - 1)
+               return (width, boundary)
+            else:
+                boundary=(leftpos+1,rightpos-1)
+                if (rightpos-1) - (leftpos+1)==0:
+                    width[charecter[pos]]=[leftpos+1,rightpos-1,1]
+                else:
+                    width[charecter[pos]] = [leftpos+1, rightpos-1, abs((rightpos-1) - (leftpos+1))+1]
+                return (width,boundary)
+
+    def longestPalindrome(self, s):
+        stack=[]
+        outbound=0
+        center=""
+        boundary=(0,0)
+        max_bound=[]
+        i=0
+        width={}
+        while i <= len(s)-1:
+            if s[i] not in width:
+                center = s[i]
+                self._longestPalindrome(width,boundary,s,i,i-1,i+1)
+                print(width)
+                if len(max_bound)==0:
+                    max_bound.append(width[s[i]][0])
+                    max_bound.append(width[s[i]][1])
+                else:
+                    if (width[s[i]][1] - width[s[i]][0]) > (max_bound[1]-max_bound[0]):
+                        max_bound[0]=width[s[i]][0]
+                        max_bound[1]=width[s[i]][1]
+                stack.append(width[s[i]][2])
+            else:
+                for j in range(i,max_bound[1]+1):
+                    if  width[s[j]][0] >= max_bound[0]  and width[s[j]][1]<= max_bound[1]:
+                        stack.append(width[s[j]][2])
+                    elif width[s[j]][0] < max_bound[0] and width[s[j]][1]<= max_bound[1]:
+                        outbound = width[s[j]][2] - ((max_bound[0] - width[s[j]][0]) + 1)
+                        stack.append(outbound)
+                if max(stack[i:max_bound[1]+1]) != outbound:
+                    repos =stack[i:max_bound[1]+1].index(max(stack[i:max_bound[1]+1]))+i
+                    center = s[repos]
+                    self._longestPalindrome(width, boundary, s, repos, repos - 1, repos + 1)
+                    if (width[center][1] - width[center][0]) > (max_bound[1] - max_bound[0]):
+                        max_bound[0] = width[center][0]
+                        max_bound[1] = width[center][1]
+                    stack[repos] = width[center][2]
+                    i = len(stack) - 1
+                else:
+                    repos=len(stack)
+                    center = s[repos]
+                    self._longestPalindrome(width, boundary, s, repos, repos - 1, repos + 1)
+                    i=len(stack)
+            i+=1
+        print(max_bound,stack)
+b='abaxabaxabybaxabyb'
+#b='xabaxy'
+check= Solution()
+check.longestPalindrome(b)
+
+-- BST for sorted array
+class Node():
+    def __init__(self, value):
+        self.value = value
+        self.left_child = None
+        self.right_child = None
+class Solution(object):
+    def __init__(self):
+        self.root = None
+    def create_bs(self,currpos,midvalue,start,end,array):
+        if start > end:
+            currpos.value=None
+            return
+        left_tree_start= start
+        left_tree_end = midvalue-1
+        right_tree_end = end
+        right_tree_start = midvalue + 1
+        # left child creation-----
+        left_tree_mid = int((left_tree_start + left_tree_end) / 2)
+        currpos.left_child = Node(array[left_tree_mid])
+        self.create_bs(currpos.left_child, left_tree_mid, start, left_tree_end, array)
+        # right child creation-----
+        right_tree_mid = int((right_tree_start + right_tree_end) / 2)
+        currpos.right_child = Node(array[right_tree_mid])
+        self.create_bs(currpos.right_child,right_tree_mid,right_tree_start,right_tree_end,array)
+
+    def twoSum(self, numbers, target):
+        """
+        :type numbers: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        start = 0
+        end = len(numbers) - 1
+        mid = int((start + end) / 2)
+        if self.root == None and len(numbers) > 0:
+            self.root = Node(numbers[mid])
+            self.create_bs(self.root, mid, start, end, numbers)
+a=Solution()
+a.twoSum([0,1,2,3,6,10,12,15,17],5)
+
+class Solution(object):
+    def twoSum(self, numbers, target):
+        """
+        :type numbers: List[int]
+        :type target: int
+        :rtype: List[int]
+        """
+        value = numbers[:]
+        start = 0
+        end = len(numbers) - 1
+        while start != end:
+            if numbers[end] + numbers[start] > target:
+                value.pop(end)
+                end = end - 1
+            elif numbers[end] + numbers[start] < target:
+                value.pop(0)
+                start=start+1
+            else:
+                return [start, end]
+        return value
+a=Solution()
+a.twoSum([1,2,3,4,4,9,56,90],8)
+
+
+# Search in rotated sorted arrays.
+class Node():
+    def __init__(self, value):
+        self.value = value
+        self.left_child = None
+        self.right_child = None
+
+
+class Solution(object):
+    def __init__(self):
+        self.root = None
+
+    def create_bs(self, currpos, midvalue, start, end, array):
+        if start > end:
+            currpos.value = None
+            return
+        left_tree_start = start
+        left_tree_end = midvalue - 1
+        right_tree_end = end
+        right_tree_start = midvalue + 1
+        # left child creation-----
+        left_tree_mid = int((left_tree_start + left_tree_end) / 2)
+        currpos.left_child = Node(array[left_tree_mid])
+        self.create_bs(currpos.left_child, left_tree_mid, start, left_tree_end, array)
+        # right child creation-----
+        right_tree_mid = int((right_tree_start + right_tree_end) / 2)
+        currpos.right_child = Node(array[right_tree_mid])
+        self.create_bs(currpos.right_child, right_tree_mid, right_tree_start, right_tree_end, array)
+
+    def search(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        sort = []
+        index = 0
+        for i, v in enumerate(nums):
+            if v > nums[i + 1]:
+                index = i
+                break
+        sort = nums[index + 1:] + nums[:index + 1]
+        start = 0
+        end = len(sort) - 1
+        mid = int((start + end) / 2)
+        if self.root == None:
+            self.root = Node(sort[mid])
+            self.create_bs(self.root, mid, start, end, sort)
+a= Solution()
+b=[4,5,6,7,0,1,2]
+a.search(b,0)
+
+#number of subarrays whoes consequtive sum is k for positive numbers
+class Solution(object):
+    def subarraySum(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: int
+        """
+        i = 0
+        stack = []
+        output = []
+        while i < len(nums):
+            if i == 0:
+                stack.append(nums[i])
+                if sum(stack) == k:
+                    output.append(stack)
+                i += 1
+            else:
+                stack.append(nums[i])
+                i += 1
+                if sum(stack) == k:
+                    output.append(stack)
+                    stack = [stack[-1]]
+                elif sum(stack) > k:
+                    stack = [stack[-1]]
+                    if stack[0] == k:
+                        output.append(stack[0])
+        print(len(output))
+        return (len(output))
+
+a=Solution()
+b=[-1,-1,1]
+a.subarraySum(b,2)
+#-- Obstacle matrix path ---
+def obstacle_path(a):
+    if len(a)==0:
+     return 0
+    paths = [[0]*len(a[0]) for i in a]
+    print(paths)
+    if a[0][0] == 1:
+        paths[0][0] = 1
+    for i in range(1, len(a)):
+        if a[i][0] == 1:
+            paths[i][0] = paths[i-1][0]
+    for j in range(1, len(a[0])):
+        if a[0][j] == 1:
+            paths[0][j] = paths[0][j-1]
+    for i in range(1, len(a)):
+        for j in range(1, len(a[0])):
+            if a[i][j] == 1:
+                paths[i][j] = paths[i-1][j] + paths[i][j-1]
+    return paths[-1][-1]
+
+print(obstacle_path(a))
+#---------------------------------------------------
+#---- Sum of subarrays equals to k--------------
+class Solution(object):
+    def subarraySum(self, nums, k):
+        count = 0
+        sum_index = 0
+        dict_look = {}
+        sum_left = 0
+        for i, v in enumerate(nums):
+            sum_index = sum_index + v
+            sum_left = sum_index - k
+            if sum_left in dict_look:
+             count += dict_look[sum_left]
+            if sum_index in dict_look:
+             dict_look[sum_index] = dict_look[sum_index]+1
+            else:
+             dict_look[sum_index]=1
+            if sum_index==k:
+             count+=1
+
+        print(count)
+b=[0,0,0]
+c=0
+a=Solution()
+a.subarraySum(b,c)
+#----------------------------------Data challange @ gust--------------------
+import numpy as np
+import pandas as pd
+a=[]
+f = open("C:/Users/rohan/Desktop/uic/data challange/data1.txt", "r")# copied the data created a text file of it and created a data frame
+for x in f:
+   a.append(x.split("\t"))
+npa= np.array(a)
+df = pd.DataFrame(npa,columns=['id', 'created_at', 'user_id', 'amount'])
+df['amount']=df['amount'].apply(lambda x: x[:-1])
+df['created_at']=df['created_at'].apply(lambda x: x[:-7])
+df.set_index("id")
+df.to_csv("C:/Users/rohan/Desktop/uic/data challange/data_to_export")
+print(df)
+
+
+
+npa= np.array(a)
+df = pd.DataFrame(npa,columns=['id', 'created_at', 'user_id', 'amount'])
+df['amount']=df['amount'].apply(lambda x: x[:-1])
+df['amount']=pd.to_numeric(df['amount'])
+df['created_at']=df['created_at'].apply(lambda x: x[:10])
+df['created_at']=pd.to_datetime(df['created_at'])
+df['month']=df['created_at'].apply(lambda x: x.month)
+df['day']=df['created_at'].apply(lambda x: x.day)
+df.set_index("id")
+df.to_csv("C:/Users/rohan/Desktop/uic/data challange/data_to_export")
+def number_of_days(df,ndays=0):
+    dicti={}
+    for i in np.unique(df['user_id']):
+        min_date=min(df[df['user_id']==i]['created_at'])
+        max_date=max((df[df['user_id']==i]['created_at']))
+        diff = (max_date-min_date)
+        if ndays==0 and diff==0:
+            dicti[i]=1
+        if int(diff.days) >= ndays:
+            dicti[i]=int(diff.days)
+    return  dicti
+def revenue_cust(custbydays,df,ndays=0):
+    dictav={}
+    for i in list(custbydays.keys()):
+        min_date=min(df[df['user_id']==i]['created_at'])
+        new_date= min_date + datetime.timedelta(days=ndays)
+        sumrev=df[(df['created_at'] <=new_date) & (df['user_id']==i)]['amount'].sum()
+        dictav[i]=round(sumrev/custbydays[i],2)
+    return dictav
+custbydays=number_of_days(df,ndays)
+averagerev_dict=revenue_cust(custbydays,df,ndays)
+final_df=pd.DataFrame()
+final_df['customer']=custbydays.keys()
+final_df['days']=custbydays.values()
+final_df['Average revenue per customer']=averagerev_dict.values()
+final_df.set_index("customer")
+print(final_df)
+#------------------------- Distinct subset in an array---------------------------------------------
+class Solution(object):
+    subset_dict={}
+    def subsetsWithDup_(self, arr, pos, subset_dict, endpos,set,subset_ar):
+        if pos == endpos:
+            a = []
+            for i in set:
+                if i != None:
+                    a.append(i)
+            if len(a) > 0 and tuple(a) not in subset_dict:
+                subset_dict[tuple(a)]='one'
+                subset_ar.append(a)
+            return
+        set[pos]=arr[pos]
+        self.subsetsWithDup_(arr,pos+1,subset_dict,endpos,set,subset_ar)
+        set[pos]=None
+        self.subsetsWithDup_(arr,pos+1,subset_dict,endpos,set,subset_ar)
+
+    def subsetsWithDup(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        set= [None]*len(nums)
+        subset_ar = []
+        subset_ar.append([])
+        start_pos = 0
+        end_pos = len(nums)
+        self.subsetsWithDup_(nums, start_pos, self.subset_dict, end_pos,set,subset_ar)
+        print(subset_ar)
+        return(subset_ar)
+a=Solution()
+b=[1,1]
+a.subsetsWithDup(b)
+
+class Solution(object):
+    def nextGreaterElement(self, findNums, nums):
+        """
+        :type findNums: List[int]
+        :type nums: List[int]
+        :rtype: List[int]
+        """
+        output=[]
+        for i in findNums:
+            ar = nums[nums.index(i):]
+            if len(ar)==1 or i==max(ar):
+                output.append(-1)
+            else:
+                for v in ar[1:]:
+                    if i < v:
+                        output.append(v)
+                        break
+        print(output)
+        return output
+
+a=Solution()
+b=[[4,1,2],
+[1,2,3,4]
+]
+a.nextGreaterElement(b[0],b[1])
